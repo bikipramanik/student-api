@@ -14,7 +14,7 @@ import (
 type HTTPServer struct {
 	// yaml:"address" maps this field to the 'address' key in YAML.
 	// env-default specifies a fallback value if not provided in config or env.
-	Addr string `yaml:"address" env-default:"localhost:8082"`
+	Addr string `yaml:"address" env-required:"true"`
 }
 
 // Config represents the overall application configuration.
@@ -38,7 +38,6 @@ func MustLoad() *Config {
 
 	// 1. Try to read the path from the environment variable CONFIG_PATH.
 	configPath = os.Getenv("CONFIG_PATH")
-	
 
 	// 2. If no environment variable was found, check command line flags: e.g. -config=config/local.yml
 	if configPath == "" {
