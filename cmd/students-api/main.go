@@ -62,7 +62,7 @@ func main() {
 	// -------------------------------------------------------------
 	// 5. Start the Server with Graceful Shutdown
 	// -------------------------------------------------------------
-	slog.Info("Server started on %s\n", cfg.HTTPServer.Addr)
+	slog.Info("Server started", slog.String("address", cfg.HTTPServer.Addr))
 
 	// Step 1: Create a channel (a message pipe) to listen for OS signals.
 	// Capacity 1 prevents missing a signal if the OS sends one quickly.
