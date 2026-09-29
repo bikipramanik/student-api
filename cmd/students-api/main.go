@@ -14,6 +14,7 @@ import (
 
 	// Import our custom configuration package from the internal directory
 	"github.com/bikipramanik/students-api/internal/config"
+	"github.com/bikipramanik/students-api/internal/http/handlers/student"
 )
 
 // main is the entry point function of the program. Execution begins here.
@@ -39,14 +40,7 @@ func main() {
 	router := http.NewServeMux()
 
 	// Register a route handler:
-	// - "GET /": matches HTTP GET requests sent to the root path "/".
-	// - Handler function receives:
-	//     * w (http.ResponseWriter): used to construct and send the HTTP response back to the client.
-	//     * r (*http.Request): represents the incoming HTTP request from the client (headers, body, query params, etc.).
-	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		// HTTP responses send raw bytes across the network, so we convert our string to []byte.
-		w.Write([]byte("Welcome to Students api"))
-	})
+	router.HandleFunc("POST /api/students", student.New())
 
 	// -------------------------------------------------------------
 	// 4. Configure HTTP Server
