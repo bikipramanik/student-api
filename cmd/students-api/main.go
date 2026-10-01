@@ -15,6 +15,7 @@ import (
 	// Import our custom configuration package from the internal directory
 	"github.com/bikipramanik/students-api/internal/config"
 	"github.com/bikipramanik/students-api/internal/http/handlers/student"
+	"github.com/bikipramanik/students-api/internal/storage/sqlite"
 )
 
 // main is the entry point function of the program. Execution begins here.
@@ -31,6 +32,13 @@ func main() {
 	// -------------------------------------------------------------
 	// In future steps, database connection and migrations will be initialized here.
 
+	storage, err := sqlite.New(cfg)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	slog.Info("Storage Initiliazed", slog.String("env", cfg.Env), slog.String("version", "1.0.0"))
 	// -------------------------------------------------------------
 	// 3. Setup Router (Request Multiplexer)
 	// -------------------------------------------------------------
@@ -40,7 +48,7 @@ func main() {
 	router := http.NewServeMux()
 
 	// Register a route handler:
-	router.HandleFunc("POST /api/students", student.New())
+	router.HandleFunc("POST /api/students", student.New(storage))
 
 	// -------------------------------------------------------------
 	// 4. Configure HTTP Server
