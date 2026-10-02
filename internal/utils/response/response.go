@@ -29,9 +29,13 @@ func WriteJson(w http.ResponseWriter, status int, data interface{}) error {
 }
 
 func GeneralError(err error) Response {
+	var errMsg string
+	if err != nil {
+		errMsg = err.Error()
+	}
 	return Response{
 		Status: StatusError,
-		Error:  err.Error(),
+		Error:  errMsg,
 	}
 }
 
