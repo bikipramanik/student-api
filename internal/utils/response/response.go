@@ -11,13 +11,27 @@ import (
 
 type Response struct {
 	Status string `json:"status"`
-	Error  string `json:"error"`
+	Error  string `json:"error,omitempty"`
+}
+
+type SuccessResponse struct {
+	Status  string      `json:"status"`
+	Message string      `json:"message,omitempty"`
+	Data    interface{} `json:"data,omitempty"`
 }
 
 const (
 	StatusOk    = "OK"
 	StatusError = "Error"
 )
+
+func Success(message string, data interface{}) SuccessResponse {
+	return SuccessResponse{
+		Status:  StatusOk,
+		Message: message,
+		Data:    data,
+	}
+}
 
 func WriteJson(w http.ResponseWriter, status int, data interface{}) error {
 

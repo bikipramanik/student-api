@@ -166,8 +166,54 @@ func UpdateStudent(strg storage.Storage) http.HandlerFunc {
 
 		}
 		students.Id = intId
-		// response.WriteJson(w, http.StatusOK, map[string]string{"message": "student updated successfully"})
-		response.WriteJson(w, http.StatusOK, students)
-
+		response.WriteJson(w, http.StatusOK, response.Success("Student updated successfully", students))
 	}
 }
+
+func PatchStudent(strg storage.Storage) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req types.PatchStudentRequest
+
+		err := json.NewDecoder(r.Body).Decode(&req)
+		if errors.Is(err, io.EOF) {
+			response.WriteJson(w, http.StatusBadRequest, response.GeneralError(fmt.Errorf("empty body")))
+			return
+		}
+		if err != nil {
+			response.WriteJson(w, http.StatusBadRequest, response.GeneralError(err))
+			return
+		}
+
+		if req.Name == nil && req.Email == nil && req.Age == nil {
+			response.WriteJson(w, http.StatusBadRequest, response.GeneralError(fmt.Errorf("at least one field (name, email, age) must be provided")))
+			return
+		}
+
+		id := r.PathValue("id")
+		slog.Info("Patching a student", slog.String("id", id))
+
+		intId, err := strconv.ParseInt(id, 10, 64)
+		if err != nil {
+			slog.Error("error converting int64 from string", slog.String("id", id))
+			response.WriteJson(w, http.StatusBadRequest, response.GeneralError(err))
+			return
+		}
+
+		err = strg.PatchStudentById(intId, req.Name, req.Email, req.Age)
+		if err != nil {
+			slog.Error("error patching student", slog.String("id", id), slog.String("error", err.Error()))
+			response.WriteJson(w, http.StatusInternalServerError, response.GeneralError(err))
+			return
+		}
+
+		updatedStudent, err := strg.GetStudentById(intId)
+		if err != nil {
+			slog.Error("error fetching updated student", slog.String("id", id))
+			response.WriteJson(w, http.StatusInternalServerError, response.GeneralError(err))
+			return
+		}
+
+		response.WriteJson(w, http.StatusOK, response.Success("Student patched successfully", updatedStudent))
+	}
+}
+
